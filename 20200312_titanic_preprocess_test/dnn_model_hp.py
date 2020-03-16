@@ -121,7 +121,7 @@ def my_bayesian_search(x_train, y_train, x_test, input_shape, valid_size=0.1, pr
         model_test_results=model_test_results
     )
 
-    save_experiment_path = os.path.join(os.getcwd(), '%s_titanic_dnn_keras_tuner_%s.json' % (prefix, DATETIME))
+    save_experiment_path = os.path.join(os.getcwd(), '%s_titanic_dnn_keras_tuner.json' % prefix)
     with open(save_experiment_path, 'w') as f:
         json.dump(experiment, f)
 
