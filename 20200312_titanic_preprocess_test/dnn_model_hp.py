@@ -125,6 +125,8 @@ def my_bayesian_search(x_train, y_train, x_test, input_shape, valid_size=0.1, pr
     with open(save_experiment_path, 'w') as f:
         json.dump(experiment, f)
 
+    return model_test_results[0]['history']
+
 
 # 主函数--------------------------------------------------------------------------------------
 if __name__ == '__main__':
@@ -133,6 +135,7 @@ if __name__ == '__main__':
     # 实验路径等信息--------------------------------------------------------------------------
     CUR_PATH = os.getcwd()
     VALID_SIZE = 0.1
+    DATETIME = datetime.now().strftime('%Y%m%d%H%M%S')
 
     # 获取数据集------------------------------------------------------------------------------
     TRAIN_FILE_PATH = os.path.join(CUR_PATH, 'titanic', 'train.csv')  # 原始训练集（含标签）文件路径
@@ -197,12 +200,16 @@ if __name__ == '__main__':
     df_train_scaled, df_test_scaled = df_train_munging.copy(), df_test_munging.copy()
 
     # 贝叶斯优化------------------------------------------------------------------------------
+    histories = dict()
+
     chars_num = df_train_encoded.shape[1]  # 原始特征数量
     input_shape = (chars_num,)
     # 数据清洗——缺失值计算——数值编码
-    my_bayesian_search(df_train_encoded, y_train, df_test_encoded, input_shape, valid_size=VALID_SIZE, prefix='encoded')
+    encoded_prefix = 'encoded'
+    histories['%s_history' % encoded_prefix] = my_bayesian_search(df_train_encoded, y_train, df_test_encoded, input_shape, valid_size=VALID_SIZE, prefix=encoded_prefix)
     # 数据清洗——缺失值计算——数值编码——无量纲化
-    my_bayesian_search(df_train_scaled, y_train, df_test_scaled, input_shape, valid_size=VALID_SIZE, prefix='scaled')
+    scaled_prefix = 'scaled'
+    histories['%s_history' % scaled_prefix] = my_bayesian_search(df_train_scaled, y_train, df_test_scaled, input_shape, valid_size=VALID_SIZE, prefix=scaled_prefix)
 
     # 数据清洗——缺失值计算——数值编码——无量纲化——降维处理（至少保留2个特征）
     for drop_dimension_num in range(1, chars_num - 1):
@@ -210,8 +217,8 @@ if __name__ == '__main__':
         df_train_reducted, df_test_reducted = dimension_reduct_handler(df_train_scaled.copy(), df_test_scaled.copy(),
                                                                        n_components=n_components)
         input_shape = (n_components,)
-        my_bayesian_search(df_train_reducted, y_train, df_test_reducted, input_shape, valid_size=VALID_SIZE,
-                           prefix='reducted_%d' % n_components)
+        reducted_prefix = 'reducted_%d' % n_components
+        histories['%s_history' % reducted_prefix] = my_bayesian_search(df_train_reducted, y_train, df_test_reducted, input_shape, valid_size=VALID_SIZE, prefix=reducted_prefix)
 
     # 特征选择(至少保留3个特征)
     for drop_char_num in range(1, chars_num - 2):
@@ -219,14 +226,20 @@ if __name__ == '__main__':
         topk = chars_num - drop_char_num
         df_train_selected, df_test_selected = select_handler(df_train_scaled.copy(), df_test_scaled.copy(), y_train, topk=topk)
         input_shape = (topk,)
-        my_bayesian_search(df_train_selected, y_train, df_test_selected, input_shape, valid_size=VALID_SIZE, prefix='selected_%d' % topk)
+        selected_prefix = 'selected_%d' % topk
+        histories['%s_history' % selected_prefix] = my_bayesian_search(df_train_selected, y_train, df_test_selected, input_shape, valid_size=VALID_SIZE, prefix=selected_prefix)
         # 数据清洗——缺失值计算——数值编码——无量纲化——特征选择——降维处理
         # 降维处理（至少保留2个特征）
         for drop_dimension_num in range(1, topk - 1):
             n_components = topk - drop_dimension_num
             df_train_reducted, df_test_reducted = dimension_reduct_handler(df_train_selected.copy(), df_test_selected.copy(), n_components=n_components)
             input_shape = (n_components,)
-            my_bayesian_search(df_train_reducted, y_train, df_test_reducted, input_shape, valid_size=VALID_SIZE, prefix='selected_%d_reducted_%d' % (topk, n_components))
+            selected_reducted_prefix = 'selected_%d_reducted_%d' % (topk, n_components)
+            histories['%s_history' % selected_reducted_prefix] = my_bayesian_search(df_train_reducted, y_train, df_test_reducted, input_shape, valid_size=VALID_SIZE, prefix='selected_%d_reducted_%d' % (topk, n_components))
+
+    save_histories_path = os.path.join(os.getcwd(), 'histories_%s.json' % DATETIME)
+    with open(save_histories_path, 'w') as f:
+        json.dump(histories, f)
 
     print('Finish!')
 
