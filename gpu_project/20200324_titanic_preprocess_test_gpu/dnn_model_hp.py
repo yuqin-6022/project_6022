@@ -16,6 +16,12 @@ from datetime import datetime
 import time
 import json
 import os
+
+import sys
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.append(rootPath)
+
 from MyPreprocessing.handlers import clean_handler, missing_handler, encode_handler, scale_handler, select_handler, dimension_reduct_handler
 
 
@@ -73,7 +79,8 @@ def my_bayesian_search(x_train, y_train, x_test, input_shape, valid_size=0.1, pr
     tuner_start_time = datetime.now()
     tuner_start = time.time()
     # 开始超参数搜索
-    tuner.search(x_train, y_train, batch_size=TUNER_BATCH_SIZE, epochs=TUNER_EPOCHS, callbacks=CALLBACKS, validation_data=(x_valid, y_valid))
+    # tuner.search(x_train, y_train, batch_size=TUNER_BATCH_SIZE, epochs=TUNER_EPOCHS, callbacks=CALLBACKS, validation_data=(x_valid, y_valid))
+    tuner.search(x_train, y_train, batch_size=TUNER_BATCH_SIZE, epochs=TUNER_EPOCHS, validation_data=(x_valid, y_valid))
     # 结束计时超参数搜索
     tuner_end_time = datetime.now()
     tuner_end = time.time()
@@ -100,7 +107,8 @@ def my_bayesian_search(x_train, y_train, x_test, input_shape, valid_size=0.1, pr
     for i in range(len(best_models)):
         hp = best_hps[i].values
         model = best_models[i]
-        history = model.fit(x_train, y_train, batch_size=FIT_BATCH_SIZE, epochs=FIT_EPOCHS, callbacks=CALLBACKS, validation_data=(x_valid, y_valid), verbose=VERBOSE)
+        # history = model.fit(x_train, y_train, batch_size=FIT_BATCH_SIZE, epochs=FIT_EPOCHS, callbacks=CALLBACKS, validation_data=(x_valid, y_valid), verbose=VERBOSE)
+        history = model.fit(x_train, y_train, batch_size=FIT_BATCH_SIZE, epochs=FIT_EPOCHS, validation_data=(x_valid, y_valid), verbose=VERBOSE)
         y_pred = model.predict(x_test)
         y_pred = [1 if y >= 0.5 else 0 for y in np.squeeze(y_pred)]  # 转换为标签
         model_performance = dict(search_rank=i, hp=hp, history=history.history.__str__(), y_pred=y_pred)
