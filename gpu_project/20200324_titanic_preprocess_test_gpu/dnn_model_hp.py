@@ -19,7 +19,8 @@ import os
 
 import sys
 curPath = os.path.abspath(os.path.dirname(__file__))
-rootPath = os.path.split(curPath)[0]
+parentPath = os.path.split(curPath)[0]
+rootPath = os.path.split(parentPath)[0]
 sys.path.append(rootPath)
 
 from MyPreprocessing.handlers import clean_handler, missing_handler, encode_handler, scale_handler, select_handler, dimension_reduct_handler
@@ -57,10 +58,7 @@ class MyHyperModel(HyperModel):
         return model
 
 
-def my_bayesian_search(x_train, y_train, x_test, input_shape, batch_size=64, epochs=100, valid_size=0.1, strategy=None, prefix=''):
-    if strategy:
-        batch_size = batch_size * strategy.num_replicas_in_sync
-
+def my_bayesian_search(x_train, y_train, x_test, input_shape, batch_size=64, epochs=100, valid_size=0.1, prefix=''):
     # 数据集划分
     x_train, x_valid, y_train, y_valid = train_test_split(x_train, y_train, test_size=valid_size)
 
@@ -76,11 +74,7 @@ def my_bayesian_search(x_train, y_train, x_test, input_shape, batch_size=64, epo
     PROJECT_NAME = '%s_titanic_dnn_keras_tuner_%s' % (prefix, DATETIME)
 
     # 实例化贝叶斯优化器
-    if strategy:
-        with strategy.scope():
-            hypermodel = MyHyperModel(input_shape)
-    else:
-        hypermodel = MyHyperModel(input_shape)
+    hypermodel = MyHyperModel(input_shape)
     tuner = BayesianOptimization(hypermodel, objective=OBJECTIVE, max_trials=MAX_TRIALS, directory=KERAS_TUNER_DIR, project_name=PROJECT_NAME)
     # 开始计时超参数搜索
     tuner_start_time = datetime.now()
@@ -164,9 +158,8 @@ if __name__ == '__main__':
     DATETIME = datetime.now().strftime('%Y%m%d%H%M%S')
 
     # 实验超参数设置--------------------------------------------------------------------------
-    BATCH_SIZE = 64
+    BATCH_SIZE = 256
     EPOCHS = 1000
-    strategy = tf.distribute.MirroredStrategy()
 
     # 获取数据集------------------------------------------------------------------------------
     TRAIN_FILE_PATH = os.path.join(CUR_PATH, 'titanic', 'train.csv')  # 原始训练集（含标签）文件路径
@@ -238,10 +231,10 @@ if __name__ == '__main__':
     input_shape = (chars_num,)
     # 数据清洗——缺失值计算——数值编码
     encoded_prefix = 'encoded'
-    histories['%s_history' % encoded_prefix] = my_bayesian_search(df_train_encoded, y_train, df_test_encoded, input_shape, batch_size=BATCH_SIZE, epochs=EPOCHS, valid_size=VALID_SIZE, strategy=strategy, prefix=encoded_prefix)
+    histories['%s_history' % encoded_prefix] = my_bayesian_search(df_train_encoded, y_train, df_test_encoded, input_shape, batch_size=BATCH_SIZE, epochs=EPOCHS, valid_size=VALID_SIZE, prefix=encoded_prefix)
     # 数据清洗——缺失值计算——数值编码——无量纲化
     scaled_prefix = 'scaled'
-    histories['%s_history' % scaled_prefix] = my_bayesian_search(df_train_scaled, y_train, df_test_scaled, input_shape, batch_size=BATCH_SIZE, epochs=EPOCHS,  valid_size=VALID_SIZE, strategy=strategy, prefix=scaled_prefix)
+    histories['%s_history' % scaled_prefix] = my_bayesian_search(df_train_scaled, y_train, df_test_scaled, input_shape, batch_size=BATCH_SIZE, epochs=EPOCHS,  valid_size=VALID_SIZE, prefix=scaled_prefix)
 
     # 数据清洗——缺失值计算——数值编码——无量纲化——降维处理（至少保留2个特征）
     for drop_dimension_num in range(1, chars_num - 1):
@@ -250,7 +243,7 @@ if __name__ == '__main__':
                                                                        n_components=n_components)
         input_shape = (n_components,)
         reducted_prefix = 'reducted_%d' % n_components
-        histories['%s_history' % reducted_prefix] = my_bayesian_search(df_train_reducted, y_train, df_test_reducted, input_shape, batch_size=BATCH_SIZE, epochs=EPOCHS,  valid_size=VALID_SIZE, strategy=strategy, prefix=reducted_prefix)
+        histories['%s_history' % reducted_prefix] = my_bayesian_search(df_train_reducted, y_train, df_test_reducted, input_shape, batch_size=BATCH_SIZE, epochs=EPOCHS,  valid_size=VALID_SIZE, prefix=reducted_prefix)
 
     # 特征选择(至少保留3个特征)
     for drop_char_num in range(1, chars_num - 2):
@@ -259,7 +252,7 @@ if __name__ == '__main__':
         df_train_selected, df_test_selected = select_handler(df_train_scaled.copy(), df_test_scaled.copy(), y_train, topk=topk)
         input_shape = (topk,)
         selected_prefix = 'selected_%d' % topk
-        histories['%s_history' % selected_prefix] = my_bayesian_search(df_train_selected, y_train, df_test_selected, input_shape, batch_size=BATCH_SIZE, epochs=EPOCHS,  valid_size=VALID_SIZE, strategy=strategy, prefix=selected_prefix)
+        histories['%s_history' % selected_prefix] = my_bayesian_search(df_train_selected, y_train, df_test_selected, input_shape, batch_size=BATCH_SIZE, epochs=EPOCHS,  valid_size=VALID_SIZE, prefix=selected_prefix)
         # 数据清洗——缺失值计算——数值编码——无量纲化——特征选择——降维处理
         # 降维处理（至少保留2个特征）
         for drop_dimension_num in range(1, topk - 1):
@@ -267,7 +260,7 @@ if __name__ == '__main__':
             df_train_reducted, df_test_reducted = dimension_reduct_handler(df_train_selected.copy(), df_test_selected.copy(), n_components=n_components)
             input_shape = (n_components,)
             selected_reducted_prefix = 'selected_%d_reducted_%d' % (topk, n_components)
-            histories['%s_history' % selected_reducted_prefix] = my_bayesian_search(df_train_reducted, y_train, df_test_reducted, input_shape, batch_size=BATCH_SIZE, epochs=EPOCHS,  valid_size=VALID_SIZE, strategy=strategy, prefix='selected_%d_reducted_%d' % (topk, n_components))
+            histories['%s_history' % selected_reducted_prefix] = my_bayesian_search(df_train_reducted, y_train, df_test_reducted, input_shape, batch_size=BATCH_SIZE, epochs=EPOCHS,  valid_size=VALID_SIZE, prefix='selected_%d_reducted_%d' % (topk, n_components))
 
     save_histories_path = os.path.join(os.getcwd(), 'histories_%s.json' % DATETIME)
     with open(save_histories_path, 'w') as f:
