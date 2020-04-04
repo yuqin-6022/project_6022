@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8b77bd11-f990-4dc5-b731-43aea9cfe88b" name="Default Changelist" comment="" />
+    <list default="true" id="8b77bd11-f990-4dc5-b731-43aea9cfe88b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/gpu_project/20200324_titanic_preprocess_test_gpu/view_hp_results_v2.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/gpu_project/20200324_titanic_preprocess_test_gpu/view_hp_results_v2.ipynb" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -9,7 +11,20 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/gpu_project/20200403_homework/lr_test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="353">
+              <caret line="115" lean-forward="true" selection-start-line="115" selection-end-line="115" />
+              <folding>
+                <element signature="e#169#192#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -34,11 +49,12 @@
         <option value="$PROJECT_DIR$/20200312_titanic_preprocess_test/dnn_model_hp.py" />
         <option value="$PROJECT_DIR$/gpu_project/20200324_titanic_preprocess_test_gpu/dnn_model_hp.py" />
         <option value="$PROJECT_DIR$/gpu_project/ttt.py" />
+        <option value="$PROJECT_DIR$/gpu_project/20200403_homework/lr_test.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="675" />
+    <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="699" />
     <option name="height" value="744" />
@@ -48,6 +64,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -74,13 +91,18 @@
             <path>
               <item name="project_6022" type="b2602c69:ProjectViewProjectNode" />
               <item name="project_6022" type="462c0819:PsiDirectoryNode" />
+              <item name="gpu_project" type="462c0819:PsiDirectoryNode" />
+              <item name="20200403_homework" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="project_6022" type="b2602c69:ProjectViewProjectNode" />
+              <item name="project_6022" type="462c0819:PsiDirectoryNode" />
               <item name="MyPreprocessing" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -113,8 +135,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12414837" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12566237" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -155,12 +178,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gpu_project/ttt.py">
+    <entry file="file://$PROJECT_DIR$/gpu_project/ttt.py" />
+    <entry file="file://$PROJECT_DIR$/gpu_project/20200403_homework/lr_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="22" column="18" lean-forward="true" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
+        <state relative-caret-position="353">
+          <caret line="115" lean-forward="true" selection-start-line="115" selection-end-line="115" />
           <folding>
-            <element signature="e#166#178#0" expanded="true" />
+            <element signature="e#169#192#0" expanded="true" />
           </folding>
         </state>
       </provider>
